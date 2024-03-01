@@ -2,8 +2,8 @@ config:
   target: 'https://Xxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/Prod'
   phases:
     - duration: 60
-      arrivalRate: 20 # 秒間の到着率を20に増やす
-      rampTo: 50      # 徐々に到着率を50まで増やす
+      arrivalRate: 40 # 秒間の到着率を40に増やす
+      rampTo: 80      # 徐々に到着率を80まで増やす
   processor: "./generate-payload.js"
   defaults:
     headers:
