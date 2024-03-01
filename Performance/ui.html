@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple API Tester</title>
+</head>
+<body>
+    <h2>購入フォーム</h2>
+    <form id="purchaseForm">
+        <label for="customerId">Customer ID:</label>
+        <input type="text" id="customerId" name="customerId" required>
+        <br><br>
+        <label for="orderId">Order ID:</label>
+        <input type="text" id="orderId" name="orderId" required>
+        <br><br>
+        <input type="submit" value="購入">
+    </form>
+
+    <h2>購入履歴表示</h2>
+    <button id="showHistory">履歴を表示</button>
+    <ul id="historyList"></ul>
+
+    <script>
+        document.getElementById('purchaseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const customerId = document.getElementById('customerId').value;
+            const orderId = document.getElementById('orderId').value;
+            fetch('https://ydk8ym5v9f.execute-api.ap-northeast-1.amazonaws.com/Prod/purchase', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ customerId, orderId })
+            })
+            .then(response => response.json())
+            .then(data => alert('購入成功!'))
+            .catch(error => alert('エラー: ' + error));
+        });
+        document.getElementById('showHistory').addEventListener('click', function() {
+            fetch('https://ydk8ym5v9f.execute-api.ap-northeast-1.amazonaws.com/Prod/history?customerId=customer129')
+            .then(response => response.json())
+            .then(data => {
+                const historyList = document.getElementById('historyList');
+                historyList.innerHTML = '';
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Order ID: ${item.orderId}, Customer ID: ${item.customerId}`;
+                    historyList.appendChild(listItem);
+                });
+            })
+            .catch(error => alert('エラー: ' + error));
+        });
+    </script>
+</body>
+</html>

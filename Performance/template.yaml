@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless EC Shop with SQS for Purchase Processing
+
+Resources:
+  PurchaseQueue:
+    Type: AWS::SQS::Queue
+  HandsonApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod # 明示的にステージ名を指定
+      CacheClusterEnabled: true
+      CacheClusterSize: '0.5' # キャッシュのサイズを指定（0.5GBから選択可能）
+      Cors: "'*'" # すべてのオリジンからのアクセスを許可
+      MethodSettings:
+        - ResourcePath: '/history' # HistoryHandlerに対応するリソースパス
+          HttpMethod: GET
+          CachingEnabled: true
+          CacheTtlInSeconds: 60 # キャッシュのTTLを60秒に設定
+  PurchaseRequestHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: purchaseRequestHandler.handler
+      Runtime: nodejs18.x
+      CodeUri: ./lambda
+      Tracing: Active
+      Environment:
+        Variables:
+          QUEUE_URL: !GetAtt PurchaseQueue.QueueUrl
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt PurchaseQueue.QueueName
+      Events:
+        PurchaseRequestEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HandsonApi
+            Path: /purchase
+            Method: post
+  PurchaseProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: purchaseProcessor.handler
+      Runtime: nodejs18.x
+      CodeUri: ./lambda
+      Tracing: Active
+      Environment:
+        Variables:
+          PURCHASE_HISTORY_TABLE_NAME: !Ref PurchaseHistoryTable
+      Events:
+        QueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt PurchaseQueue.Arn
+            BatchSize: 10
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref PurchaseHistoryTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PurchaseHistoryTable
+  HistoryHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: historyHandler.handler
+      Runtime: nodejs18.x
+      CodeUri: ./lambda
+      Tracing: Active
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PurchaseHistoryTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PurchaseHistoryTable
+      Events:
+        HistoryEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HandsonApi
+            Path: /history
+            Method: get
+  PurchaseHistoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PurchaseHistory
+      AttributeDefinitions:
+        - AttributeName: customerId
+          AttributeType: S
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: customerId
+          KeyType: HASH
+        - AttributeName: orderId
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+Globals:
+  Function:
+    Timeout: 3
+    Tracing: Active
+  Api:
+    TracingEnabled: True
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${HandsonApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
