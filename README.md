@@ -5,7 +5,7 @@
 まずは高速化が行われていないシステムをデプロイします。<br>
 このシステムはECショップのAPIを提供しており、購入機能、購入履歴の表示機能があります。
 
-構成図１
+![JAWS drawio](https://github.com/seike460/serverless-performance-handson/assets/8141624/25cfbb99-c203-4f46-b3d9-e074684904dd)
 
 今回権限不足によるワークショップの失敗を防ぐ為に、AdministratorAccessをもつIAMを作成します。<br>
 本来は最小権限の原則に基づき必要な権限のみ設定するようにしてください。
