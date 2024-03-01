@@ -1,0 +1,21 @@
+config:
+  target: 'https://eri3zmndn8.execute-api.ap-northeast-1.amazonaws.com/Prod/'
+  phases:
+    - duration: 60
+      arrivalRate: 20 # 秒間の到着率を20に増やす
+      rampTo: 50      # 徐々に到着率を50まで増やす
+  processor: "./generate-payload.js"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+scenarios:
+  - name: "Post to purchase"
+    flow:
+      - function: "generatePayload"
+      - post:
+          url: "/purchase"
+          json: "{{ payload }}"
+  - name: "Get history"
+    flow:
+      - get:
+          url: "/history"

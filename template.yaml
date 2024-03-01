@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless EC Shop Application - Before Improvements
+Resources:
+  PurchaseHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: purchaseHandler.handler
+      Runtime: nodejs18.x
+      CodeUri: ./lambda
+      Tracing: Active
+      Events:
+        PurchaseEvent:
+          Type: Api
+          Properties:
+            Path: /purchase
+            Method: post
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref PurchaseHistoryTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PurchaseHistoryTable
+  HistoryHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: historyHandler.handler
+      Runtime: nodejs18.x
+      CodeUri: ./lambda
+      Tracing: Active
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PurchaseHistoryTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PurchaseHistoryTable
+      Events:
+        HistoryEvent:
+          Type: Api
+          Properties:
+            Path: /history
+            Method: get
+  PurchaseHistoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PurchaseHistory
+      AttributeDefinitions:
+        - AttributeName: customerId
+          AttributeType: S
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: customerId
+          KeyType: HASH
+        - AttributeName: orderId
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+Globals:
+  Function:
+    Timeout: 3
+    Tracing: Active
+  Api:
+    TracingEnabled: True
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

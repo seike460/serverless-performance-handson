@@ -1,0 +1,7 @@
+{
+  "name": "serverless-performance-handson",
+  "version": "1.0.0",
+  "dependencies": {
+    "aws-xray-sdk": "^3.5.4"
+  }
+}
