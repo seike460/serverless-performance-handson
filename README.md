@@ -13,18 +13,18 @@
 マネコン上部の検索バーで「IAM」を検索してクリックし、AWS IAMサービスのコンソールに移動します。<br>
 IAMコンソール左側の「ユーザー」をクリックし、画面右側の「ユーザーの作成」をクリックします。
 
-<img width="1148" alt="スクリーンショット 2024-03-02 5 33 57" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/72866842-ff87-4faf-b60e-253b83ccc19d">
+<img width="1148" alt="1" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/424cf295-c1ab-4d7e-9e74-c5df2ba674aa">
 
 ユーザー名：お好きなあなたのユーザー名（handsonなど）<br>
 「AWS マネジメントコンソールへのユーザーアクセスを提供する」にチェックを入れる<br>
 コンソールパスワード：「カスタムパスワード」を選択しお好きなパスワードを入力<br>
 「ユーザーは次回のサインイン時に新しいパスワードを作成する必要があります」のチェックを外す<br>
 
-<img width="1382" alt="スクリーンショット 2024-03-02 5 35 07" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/7442710a-580e-4aed-9b6f-145a8cfc9809">
+<img width="1382" alt="2" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/04194fac-6dc2-44f2-9fa3-e61a1dcd4b85">
 
 「次へ」をクリックし、「ポリシーを直接アタッチする」を選択して、許可ポリシーから「AdministratorAccess」を検索してチェックを入れます。
 
-<img width="1396" alt="スクリーンショット 2024-03-02 5 35 42" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/01169bfa-3cb7-42a5-96e5-3ba348eae043">
+<img width="1396" alt="3" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/f4bfe8f8-2caa-4cd3-acb8-4b12f30ec269">
 
 「次へ」をクリックすると確認画面になるので、「ユーザーの作成」をクリックします。<br>
 その後、マネコン右上のAWSアカウント名をクリックして「サインアウト」をクリックします。
@@ -46,7 +46,7 @@ IAMコンソール左側の「ユーザー」をクリックし、画面右側�
 aws ec2 create-default-vpc
 ```
 
-<img width="904" alt="スクリーンショット 2024-03-02 5 42 53" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/cae426db-4739-4a8c-b79a-8dc8731f05c2">
+<img width="904" alt="4" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/5aba0eb9-50c2-434f-bf10-abd3fe90dd6c">
 
 このシステムをデプロイするために、Git Cloneを行ってCloud9にプログラムを持ってきます。<br>
 Cloud9のコンソールを開いて次のコマンドを実行してください。
@@ -152,7 +152,7 @@ http.response_time:
 
 マネコン上部の検索バーで「X-Ray」を検索してクリックし、X-Rayサービスのコンソールに移動します。<br>
 
-![スクリーンショット 2024-03-02 6 58 32](https://github.com/seike460/serverless-performance-handson/assets/8141624/62aa0f65-979d-449f-8266-aa4fdb7d873d)
+![5](https://github.com/seike460/serverless-performance-handson/assets/8141624/4111ee20-733a-404f-9700-130446fe0466)
 
 Trace Mapが表示されているはずです。 <br>
 ここで購入履歴の表示ｍｐ「serverless-performance-handson-HistoryHandler-XXXXXXX」が大量にエラー担っている事がわかります。<br>
@@ -161,7 +161,7 @@ Trace Mapが表示されているはずです。 <br>
 ソースコードを見てみると、じつはこのプログラムはDynamoDBを全Scanしている事がわかりました。<br>
 すべてのデータを取得していると考えると、改善の余地がありますね
 
-<img width="1004" alt="スクリーンショット 2024-03-02 7 06 04" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/fe614044-60be-4abe-b91c-486d69661dc3">
+<img width="1004" alt="6" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/be296fcb-36f5-4560-a57c-259a677e5bbb">
 
 続いて購入処理の「serverless-performance-handson-PurchaseHandler-XXXXXXXX」を見ていると購入処理は成功しているのですが、１秒ほどかかっている事がわかります。<br>
 どこで時間がかかっているかを特定するために、トレースの分析を押します。
@@ -180,6 +180,7 @@ Trace Mapが表示されているはずです。 <br>
 以下のコマンドを実行して、すべてのプログラムを入れ替えます。
 
 ```
+mv lambda first_lambda
 mv Performance/* .
 ```
 
