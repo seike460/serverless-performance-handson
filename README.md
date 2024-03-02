@@ -153,7 +153,13 @@ http.response_time:
 
 その後X-rayの画面に移動して、ボトルネックを特定してみます。
 
-マネコン上部の検索バーで「X-Ray」を検索してクリックし、X-Rayサービスのコンソールに移動します。<br>
+マネコン上部の検索バーで「X-Ray」を検索してクリックし、X-Rayサービスのコンソールに移動します。<br>その後[X-Ray traces]内にあるTrace Mapをクリックしましょう。
+
+<img width="1042" alt="スクリーンショット 2024-03-02 8 51 29" src="https://github.com/seike460/serverless-performance-handson/assets/95597878/94915b86-eaf3-4190-8136-e87767fb8445">
+
+東京リージョンにデプロイしている場合は、こちらのURLから直接移動することもできます。
+
+https://ap-northeast-1.console.aws.amazon.com/cloudwatch/home?region=ap-northeast-1#xray:service-map/map
 
 ![5](https://github.com/seike460/serverless-performance-handson/assets/8141624/4111ee20-733a-404f-9700-130446fe0466)
 
