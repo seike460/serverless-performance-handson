@@ -268,7 +268,7 @@ SQSについては、[builders.flashに入門記事があります](https://aws.
 まずCloud9のターミナルで、現在いるディレクトリを確認しましょう。
 
 ```bash
-$ pwd
+pwd
 /home/ec2-user/environment/serverless-performance-handson
 ```
 
@@ -285,7 +285,7 @@ mv Performance/* .
 `ls -la`コマンドを実行すると、`first_lambda`と`lambda`ディレクトリの両方があることが確認できます。
 
 ```bash
-$ ls -la
+ls -la
 total 56
 drwxr-xr-x. 7 ec2-user ec2-user 16384 Mar  2 00:14 .
 drwxr-xr-x. 4 ec2-user ec2-user    72 Mar  1 23:39 ..
@@ -302,7 +302,7 @@ drwxr-xr-x. 2 ec2-user ec2-user    92 Mar  1 23:39 lambda
 Lambdaの中身が変わりましたので、再びビルドを行います。
 
 ```
-$ sam build
+sam build
 ```
 `Build Succeeded`とメッセージが表示されれば、ビルド成功です。続いてデプロイも実行しましょう。
 
