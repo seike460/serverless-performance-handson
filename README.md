@@ -265,21 +265,75 @@ SQSについては、[builders.flashに入門記事があります](https://aws.
 ## 手順3
 
 それでは改善版のプログラムをデプロイします。<br>
-以下のコマンドを実行して、すべてのプログラムを入れ替えます。
+まずCloud9のターミナルで、現在いるディレクトリを確認しましょう。
+
+```bash
+$ pwd
+/home/ec2-user/environment/serverless-performance-handson
+```
+
+もし他のディレクトリ名が表示された場合は、一旦`serverless-performance-handson`内まで移動してください。
+
+その後、以下のコマンドを実行して、すべてのプログラムを入れ替えます。
 
 ```
 mv lambda first_lambda
 mv Performance/* .
 ```
 
-その後デプロイを行います。
+これでAWS Lambdaのソースコードを、新しいものに入れ替えることができました。
+`ls -la`コマンドを実行すると、`first_lambda`と`lambda`ディレクトリの両方があることが確認できます。
+
+```bash
+$ ls -la
+total 56
+drwxr-xr-x. 7 ec2-user ec2-user 16384 Mar  2 00:14 .
+drwxr-xr-x. 4 ec2-user ec2-user    72 Mar  1 23:39 ..
+drwxr-xr-x. 5 ec2-user ec2-user    62 Mar  1 23:40 .aws-sam
+drwxr-xr-x. 8 ec2-user ec2-user   163 Mar  1 23:39 .git
+-rw-r--r--. 1 ec2-user ec2-user  3484 Mar  1 23:39 .gitignore
+drwxr-xr-x. 2 ec2-user ec2-user     6 Mar  2 00:14 Performance
+-rw-r--r--. 1 ec2-user ec2-user 11806 Mar  1 23:39 README.md
+drwxr-xr-x. 3 ec2-user ec2-user   140 Mar  1 23:39 first_lambda
+-rw-r--r--. 1 ec2-user ec2-user   356 Mar  1 23:39 generate-payload.js
+drwxr-xr-x. 2 ec2-user ec2-user    92 Mar  1 23:39 lambda
+```
+
+Lambdaの中身が変わりましたので、再びビルドを行います。
 
 ```
-sam build
+$ sam build
+```
+`Build Succeeded`とメッセージが表示されれば、ビルド成功です。続いてデプロイも実行しましょう。
+
+```
 sam deploy
 ```
 
-URLが再度出力されるので、load-test.ymlのtargetにコピペします。
+デプロイに成功すると、最後に次のようなメッセージが表示されます。
+
+```
+CloudFormation outputs from deployed stack
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Outputs                                                                                                                                                                                            
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Key                 ApiUrl                                                                                                                                                                         
+Description         API Gateway endpoint URL for Prod stage                                                                                                                                        
+Value               https://xxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/                                                                                                              
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+```
+
+URLが再度出力されるので、今度は`load-test.yml`のtargetにコピペします。
+
+
+```diff
+config:
+-   target: 'https://eri3zmndn8.execute-api.ap-northeast-1.amazonaws.com/Prod/'
++  target: 'https://xxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/'
+  phases:
+
+```
+
 
 その後、負荷試験を行います。
 
@@ -299,7 +353,33 @@ http.response_time:
   p99: ......................................................................... 1380.5
 ```
 
+`http.codes.502`もほとんど出なくなったのではないかと思います。
+
+```
+--------------------------------
+Summary report @ 00:30:45(+0000)
+--------------------------------
+
+http.codes.200: ................................................................ 1754
+http.codes.202: ................................................................ 1846
+http.downloaded_bytes: ......................................................... 317151
+http.request_rate: ............................................................. 61/sec
+```
+
 購入履歴の表示はDynamoDBはScanからQueryに変更されています。
+
+```
+  const params = {
+    TableName: tableName,
+    KeyConditionExpression: "customerId = :customerId",
+    ExpressionAttributeValues: {
+      ":customerId": { S: customerId }
+    }
+  };
+  try {
+    const command = new QueryCommand(params);
+```
+
 今回はパーティションキーのみの指定ですが、更にソートキーやセカンダリインデックスを活用する事でパフォーマンスの向上が見込めます。
 
 また購入処理はSQSにデータを送信しておいて、バックエンド処理でDynamoDBに保存されるようになっています。
