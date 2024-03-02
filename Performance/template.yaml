@@ -9,14 +9,14 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod # 明示的にステージ名を指定
-      CacheClusterEnabled: true
-      CacheClusterSize: '0.5' # キャッシュのサイズを指定（0.5GBから選択可能）
       Cors: "'*'" # すべてのオリジンからのアクセスを許可
-      MethodSettings:
-        - ResourcePath: '/history' # HistoryHandlerに対応するリソースパス
-          HttpMethod: GET
-          CachingEnabled: true
-          CacheTtlInSeconds: 60 # キャッシュのTTLを60秒に設定
+      #CacheClusterEnabled: true
+      #CacheClusterSize: '0.5' # キャッシュのサイズを指定（0.5GBから選択可能）
+      #MethodSettings:
+      #  - ResourcePath: '/history' # HistoryHandlerに対応するリソースパス
+      #    HttpMethod: GET
+      #    CachingEnabled: true
+      #    CacheTtlInSeconds: 60 # キャッシュのTTLを60秒に設定
   PurchaseRequestHandler:
     Type: AWS::Serverless::Function
     Properties:

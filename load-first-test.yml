@@ -1,5 +1,5 @@
 config:
-  target: 'https://eri3zmndn8.execute-api.ap-northeast-1.amazonaws.com/Prod/'
+  target: 'https://XxxxxxxxxX.execute-api.ap-northeast-1.amazonaws.com/Prod/'
   phases:
     - duration: 60
       arrivalRate: 40 # 秒間の到着率を40に増やす
