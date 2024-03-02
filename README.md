@@ -167,8 +167,8 @@ load-first-test.ymlを編集して※①でコピーしておいたURLをtarget�
 
 ```diff
 config:
--   target: 'https://eri3zmndn8.execute-api.ap-northeast-1.amazonaws.com/Prod/'
-+  target: 'https://xxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/'
+-   target: 'https://XxxxxxxxxX.execute-api.ap-northeast-1.amazonaws.com/Prod/'
++  target: 'https://【あなた独自のURL】.execute-api.ap-northeast-1.amazonaws.com/Prod/'
   phases:
 
 ```
@@ -328,10 +328,9 @@ URLが再度出力されるので、今度は`load-test.yml`のtargetにコピ�
 
 ```diff
 config:
--   target: 'https://eri3zmndn8.execute-api.ap-northeast-1.amazonaws.com/Prod/'
-+  target: 'https://xxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/'
+-   target: 'https://XxxxxxxxxX.execute-api.ap-northeast-1.amazonaws.com/Prod/'
++  target: 'https://【あなた独自のURL】.execute-api.ap-northeast-1.amazonaws.com/Prod/'
   phases:
-
 ```
 
 
@@ -368,7 +367,7 @@ http.request_rate: .............................................................
 
 購入履歴の表示はDynamoDBはScanからQueryに変更されています。
 
-```
+```js
   const params = {
     TableName: tableName,
     KeyConditionExpression: "customerId = :customerId",
@@ -383,14 +382,48 @@ http.request_rate: .............................................................
 今回はパーティションキーのみの指定ですが、更にソートキーやセカンダリインデックスを活用する事でパフォーマンスの向上が見込めます。
 
 また購入処理はSQSにデータを送信しておいて、バックエンド処理でDynamoDBに保存されるようになっています。
-購入処理は自分たちではどうしようもないのですが、ユーザー体験は明らかに改善が見込めました。
+
+```js
+    const message = { body: event.body, timestamp: new Date().toISOString() };
+    const command = new SendMessageCommand({
+      QueueUrl: queueUrl,
+      MessageBody: JSON.stringify(message)
+    });
+    await client.send(command);
+
+```
+
+```js
+    await new Promise(resolve => setTimeout(resolve, 1000)); // 1秒遅延
+    const message = JSON.parse(record.body)
+    const purchaseData = JSON.parse(message.body);
+    const params = {
+      TableName: tableName,
+      Item: {
+        customerId: { S: purchaseData.customerId },
+        orderId: { S: purchaseData.orderId },
+        orderDate: { S: message.timestamp },
+        items: { S: JSON.stringify(purchaseData.items) },
+        totalAmount: { N: purchaseData.totalAmount.toString() } 
+      }
+    };
+    try {
+      await client.send(new PutItemCommand(params));
+      console.log(`Purchase record saved: ${purchaseData.orderId}`);
+    } catch (error) {
+      console.error(`Error saving purchase record:`, error);
+    }
+  });
+```
+
+購入処理は自分たちではどうしようもないのですが、バックエンドに処理を送ることでユーザー体験は明らかに改善が見込めました。
 
 ## 手順4
 
 ここから先は時間がある方が行ってみてください。
 
 購入履歴の表示を更に改善してみましょう。<br>
-今回購入履歴は、1分間キャシュを聞かせても良いという事になりました。<br>
+今回購入履歴は、1分間キャシュを聞かせても良いという事になったと仮定します。<br>
 そこで、API Gatewayのキャッシュをつかって更に負荷を軽減しましょう
 
 template.yamlの `CacheClusterEnabled` のあたりのコメントアウトを解除してデプロイします。
