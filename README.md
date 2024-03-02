@@ -180,17 +180,48 @@ Trace Mapが表示されているはずです。 <br>
 ## 手順3
 
 それでは改善版のプログラムをデプロイします。<br>
-以下のコマンドを実行して、すべてのプログラムを入れ替えます。
+まずCloud9のターミナルで、現在いるディレクトリを確認しましょう。
+
+```bash
+$ pwd
+/home/ec2-user/environment/serverless-performance-handson
+```
+
+もし他のディレクトリ名が表示された場合は、一旦`serverless-performance-handson`内まで移動してください。
+
+その後、以下のコマンドを実行して、すべてのプログラムを入れ替えます。
 
 ```
 mv lambda first_lambda
 mv Performance/* .
 ```
 
-その後デプロイを行います。
+これでAWS Lambdaのソースコードを、新しいものに入れ替えることができました。
+`ls -la`コマンドを実行すると、`first_lambda`と`lambda`ディレクトリの両方があることが確認できます。
+
+```bash
+$ ls -la
+total 56
+drwxr-xr-x. 7 ec2-user ec2-user 16384 Mar  2 00:14 .
+drwxr-xr-x. 4 ec2-user ec2-user    72 Mar  1 23:39 ..
+drwxr-xr-x. 5 ec2-user ec2-user    62 Mar  1 23:40 .aws-sam
+drwxr-xr-x. 8 ec2-user ec2-user   163 Mar  1 23:39 .git
+-rw-r--r--. 1 ec2-user ec2-user  3484 Mar  1 23:39 .gitignore
+drwxr-xr-x. 2 ec2-user ec2-user     6 Mar  2 00:14 Performance
+-rw-r--r--. 1 ec2-user ec2-user 11806 Mar  1 23:39 README.md
+drwxr-xr-x. 3 ec2-user ec2-user   140 Mar  1 23:39 first_lambda
+-rw-r--r--. 1 ec2-user ec2-user   356 Mar  1 23:39 generate-payload.js
+drwxr-xr-x. 2 ec2-user ec2-user    92 Mar  1 23:39 lambda
+```
+
+Lambdaの中身が変わりましたので、再びビルドを行います。
 
 ```
-sam build
+$ sam build
+```
+`Build Succeeded`とメッセージが表示されれば、ビルド成功です。続いてデプロイも実行しましょう。
+
+```
 sam deploy
 ```
 
