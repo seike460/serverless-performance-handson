@@ -158,24 +158,45 @@ http.response_time:
 ![5](https://github.com/seike460/serverless-performance-handson/assets/8141624/4111ee20-733a-404f-9700-130446fe0466)
 
 Trace Mapが表示されているはずです。 <br>
-ここで購入履歴の表示ｍｐ「serverless-performance-handson-HistoryHandler-XXXXXXX」が大量にエラー担っている事がわかります。<br>
+ここで購入履歴の表示ｍｐ「serverless-performance-handson-HistoryHandler-XXXXXXX」が大量にエラーになっている事がわかります。<br>
 なおかつDynamoDBに対しての接続でエラーとなっているようです。<br>
 
-ソースコードを見てみると、じつはこのプログラムはDynamoDBを全Scanしている事がわかりました。<br>
+ソースコードを見てみると、じつはこのプログラムはDynamoDBを全Scanしている事がわかりました。
+
+```js
+  const params = {
+    TableName: tableName,
+  };
+  const command = new ScanCommand(params);
+  const data = await dynamoDBClient.send(command);
+```
+
 すべてのデータを取得していると考えると、改善の余地がありますね
 
 <img width="1004" alt="6" src="https://github.com/seike460/serverless-performance-handson/assets/8141624/be296fcb-36f5-4560-a57c-259a677e5bbb">
 
 続いて購入処理の「serverless-performance-handson-PurchaseHandler-XXXXXXXX」を見ていると購入処理は成功しているのですが、１秒ほどかかっている事がわかります。<br>
+
+<img width="640" alt="スクリーンショット 2024-03-02 8 53 27" src="https://github.com/hideokamoto-stripe/serverless-performance-handson/assets/95597878/83e7b8d8-3159-4cda-a6d3-751a521e07fd">
+
 どこで時間がかかっているかを特定するために、トレースの分析を押します。
+<img width="1428" alt="スクリーンショット 2024-03-02 8 58 04" src="https://github.com/hideokamoto-stripe/serverless-performance-handson/assets/95597878/2ffdf40d-ff11-42fb-a852-fc457543d90f">
 
 「トレースのリスト」が下部にあるのでそちらの一番時間がかかっているものをクリックしてみます
 
+<img width="1527" alt="スクリーンショット 2024-03-02 8 58 21" src="https://github.com/hideokamoto-stripe/serverless-performance-handson/assets/95597878/87eac968-33b2-4fe2-8e80-c35b0b8a174e">
+
 セグメントのタイムラインを見てみると、DynamoDBではなくて処理に時間がかかっているようです。<br>
+
+<img width="1636" alt="スクリーンショット 2024-03-02 8 58 49" src="https://github.com/hideokamoto-stripe/serverless-performance-handson/assets/95597878/d4546e7c-e2b0-46fb-9674-82c6a6139c64">
+
+
 ソースコードを見てみると、「ここで別システムに対して購入処理を行っている」というコメントを見つけました。
 
 これは私達ではどうしようもありません。
 せめて購入時の体験を良くするために、SQSを利用した購入体験を向上させましょう。
+
+SQSについては、[builders.flashに入門記事があります](https://aws.amazon.com/jp/builders-flash/202208/master-asynchronous-execution-03/?awsf.filter-name=*all)ので、ぜひこちらもお試しください。
 
 ## 手順3
 
