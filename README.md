@@ -71,13 +71,18 @@ cd ../
 sam build
 ```
 
-`Build Succeeded` と表示されていればOK
+`Build Succeeded` と表示されていればOKです。
 
 続いてデプロイします。
 
 ```
 sam deploy --guided
+```
 
+このコマンドを実行すると、対話形式でAWSアカウント上に複数のリソースを生成・デプロイします。
+質問内容と回答の例を次に用意しましたので、参考にしながら操作を完了させてください。
+
+```
 Configuring SAM deploy
 ======================
 
@@ -109,8 +114,43 @@ Deploy this changeset? [y/N]: y
 
 ```
 
-Stack Nameは任意ですが、それ以外は上記のように答えてください。<br>
-デプロイされたら、表示された自分のURLをコピーしておいてください。 ... ※①
+基本的には、スタック名（Stack Name）以外はほぼ全てに`Y`と回答してもらえればOKです。
+
+デプロイに成功すると、次のようなリソースがAWSアカウント内に生成されます。
+
+```
+CloudFormation stack changeset
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Operation                                        LogicalResourceId                                ResourceType                                     Replacement                                    
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
++ Add                                            HistoryHandlerHistoryEventPermissionProd         AWS::Lambda::Permission                          N/A                                            
++ Add                                            HistoryHandlerRole                               AWS::IAM::Role                                   N/A                                            
++ Add                                            HistoryHandler                                   AWS::Lambda::Function                            N/A                                            
++ Add                                            PurchaseHandlerPurchaseEventPermissionProd       AWS::Lambda::Permission                          N/A                                            
++ Add                                            PurchaseHandlerRole                              AWS::IAM::Role                                   N/A                                            
++ Add                                            PurchaseHandler                                  AWS::Lambda::Function                            N/A                                            
++ Add                                            PurchaseHistoryTable                             AWS::DynamoDB::Table                             N/A                                            
++ Add                                            ServerlessRestApiDeployment2593192fda            AWS::ApiGateway::Deployment                      N/A                                            
++ Add                                            ServerlessRestApiProdStage                       AWS::ApiGateway::Stage                           N/A                                            
++ Add                                            ServerlessRestApi                                AWS::ApiGateway::RestApi                         N/A                                            
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+```
+
+デプロイに成功すると、最後に次のようなメッセージが表示されます。
+
+```
+
+CloudFormation outputs from deployed stack
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Outputs                                                                                                                                                                                            
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Key                 ApiUrl                                                                                                                                                                         
+Description         API Gateway endpoint URL for Prod stage                                                                                                                                        
+Value               https://xxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/                                                                                                              
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+```
+
+このURLをワークショップでは利用しますので、自分のURLをコピーしておいてください。 ... ※①
 
 またインストールに時間がかかる 負荷試験ツールであるArtilleryをインストールします。
 
