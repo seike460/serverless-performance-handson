@@ -125,6 +125,14 @@ npm install -g artillery
 実際に負荷をかける事で、どこにボトルネックが存在するかを炙り出しましょう。<br>
 load-first-test.ymlを編集して※①でコピーしておいたURLをtargetに設定しましょう。
 
+```diff
+config:
+-   target: 'https://eri3zmndn8.execute-api.ap-northeast-1.amazonaws.com/Prod/'
++  target: 'https://xxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/'
+  phases:
+
+```
+
 
 その後、以下のコマンドを利用して負荷をかけます。<br>
 Cloud9からリクエストが飛んで、先程デプロイしたAPIに負荷がかかります。<br>
